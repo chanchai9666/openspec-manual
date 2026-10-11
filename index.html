@@ -1,0 +1,1850 @@
+<!DOCTYPE html>
+<html lang="th" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>คู่มือการใช้งาน OpenSpec ภาษาไทย (Unofficial v1.x) — Spec-Driven Development Manual</title>
+  <meta name="description" content="คู่มือการใช้งาน OpenSpec ภาษาไทยฉบับไม่เป็นทางการ (Unofficial v1.x) - สรุปครบถ้วนเรื่อง Spec-Driven Development (SDD) & Agreement Layer ระหว่างคุณกับ AI Coding Agent รองรับ AI 30+ ตัว">
+  
+  <!-- Google Fonts: Inter, Prompt & Fira Code -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --font-body: 'Prompt', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-code: 'Fira Code', monospace;
+      
+      /* Dark Theme (Default) */
+      --bg-primary: #0a0d14;
+      --bg-secondary: #0f172a;
+      --bg-surface: #131c2e;
+      --bg-surface-elevated: #1e293b;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(56, 189, 248, 0.4);
+      
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-faint: #64748b;
+      
+      --accent-cyan: #38bdf8;
+      --accent-blue: #3b82f6;
+      --accent-indigo: #818cf8;
+      --accent-purple: #c084fc;
+      --accent-emerald: #34d399;
+      --accent-amber: #fbbf24;
+      --accent-rose: #f43f5e;
+      
+      --code-bg: #070c18;
+      --code-text: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.45);
+      --sidebar-width: 310px;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #f1f5f9;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #f8fafc;
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-focus: rgba(14, 165, 233, 0.4);
+      
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --text-faint: #94a3b8;
+      
+      --accent-cyan: #0284c7;
+      --accent-blue: #2563eb;
+      --accent-indigo: #6366f1;
+      --accent-purple: #9333ea;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --accent-rose: #e11d48;
+      
+      --code-bg: #1e293b;
+      --code-text: #f8fafc;
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+    
+    body {
+      font-family: var(--font-body);
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.7;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(10, 13, 20, 0.88);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      padding: 0 24px;
+      transition: background 0.25s ease;
+    }
+    [data-theme="light"] .navbar {
+      background: rgba(248, 250, 252, 0.9);
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+
+    .brand-badge {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(192, 132, 252, 0.2));
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .search-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-box input {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-radius: 8px;
+      padding: 6px 12px 6px 34px;
+      font-size: 0.875rem;
+      font-family: var(--font-body);
+      outline: none;
+      width: 220px;
+      transition: all 0.2s ease;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px var(--border-focus);
+      width: 270px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      width: 16px;
+      height: 16px;
+      color: var(--text-faint);
+      pointer-events: none;
+    }
+
+    .btn-icon {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 8px;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-icon:hover {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      border-color: var(--accent-cyan);
+    }
+
+    .btn-github {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-github:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      transform: translateY(-1px);
+    }
+
+    .mobile-menu-toggle { display: none; }
+
+    /* Layout */
+    .app-layout {
+      display: flex;
+      flex: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: var(--sidebar-width);
+      position: sticky;
+      top: 64px;
+      height: calc(100vh - 64px);
+      overflow-y: auto;
+      padding: 24px 16px;
+      border-right: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      flex-shrink: 0;
+    }
+
+    .sidebar::-webkit-scrollbar { width: 5px; }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    .sidebar-section { margin-bottom: 24px; }
+
+    .sidebar-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-faint);
+      margin-bottom: 10px;
+      padding-left: 8px;
+    }
+
+    .sidebar-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 400;
+      transition: all 0.15s ease;
+      line-height: 1.4;
+    }
+
+    .sidebar-link:hover {
+      color: var(--text-main);
+      background: var(--bg-surface);
+    }
+
+    .sidebar-link.active {
+      color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.12);
+      font-weight: 600;
+      border-left: 3px solid var(--accent-cyan);
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      padding: 40px 48px 80px 48px;
+      max-width: 980px;
+    }
+
+    /* Hero Banner (speckit-manual style) */
+    .hero-banner {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.12) 0%, rgba(129, 140, 248, 0.08) 50%, rgba(192, 132, 252, 0.12) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 36px 32px;
+      margin-bottom: 48px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-banner::before {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
+      filter: blur(24px);
+      pointer-events: none;
+    }
+
+    .hero-title {
+      font-size: 2.25rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 16px;
+      background: linear-gradient(to right, #f8fafc, #38bdf8, #818cf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    [data-theme="light"] .hero-title {
+      background: linear-gradient(to right, #0f172a, #0284c7, #4f46e5);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .hero-tag {
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    /* Headings */
+    h1, h2, h3, h4, h5 {
+      color: var(--text-main);
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    h2 {
+      font-size: 1.65rem;
+      margin-top: 56px;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h2 .section-badge {
+      font-size: 0.8rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--accent-cyan);
+      font-family: var(--font-code);
+      font-weight: 600;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      margin-top: 32px;
+      margin-bottom: 14px;
+    }
+
+    p { margin-bottom: 16px; color: var(--text-muted); }
+    ul, ol { margin-bottom: 20px; padding-left: 24px; color: var(--text-muted); }
+    li { margin-bottom: 8px; }
+    strong { color: var(--text-main); font-weight: 600; }
+    a { color: var(--accent-cyan); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Card Containers */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .feature-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+    .feature-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .feature-card h4 { font-size: 1.05rem; margin-bottom: 8px; }
+    .feature-card p { font-size: 0.9rem; margin-bottom: 0; }
+
+    /* Dual Command Cards (CLI vs Agent) */
+    .command-channels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 24px 0;
+    }
+    @media (max-width: 768px) {
+      .command-channels { grid-template-columns: 1fr; }
+    }
+
+    .channel-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 22px;
+      position: relative;
+    }
+    .channel-card.cli { border-top: 4px solid var(--accent-emerald); }
+    .channel-card.agent { border-top: 4px solid var(--accent-purple); }
+
+    .channel-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+    .channel-badge.cli { background: rgba(52, 211, 153, 0.15); color: var(--accent-emerald); }
+    .channel-badge.agent { background: rgba(192, 132, 252, 0.15); color: var(--accent-purple); }
+
+    /* Workflow Comparison Cards */
+    .compare-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 24px 0;
+    }
+    @media (max-width: 768px) {
+      .compare-container { grid-template-columns: 1fr; }
+    }
+
+    .compare-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 24px;
+    }
+    .compare-card.full { border-top: 4px solid var(--accent-cyan); }
+    .compare-card.lite { border-top: 4px solid var(--accent-amber); }
+
+    /* Callout Alerts */
+    .callout {
+      border-left: 4px solid var(--accent-cyan);
+      background: var(--bg-surface);
+      border-radius: 0 10px 10px 0;
+      padding: 16px 20px;
+      margin: 24px 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .callout-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .callout-info { border-left-color: var(--accent-cyan); }
+    .callout-info .callout-title { color: var(--accent-cyan); }
+    .callout-tip { border-left-color: var(--accent-emerald); }
+    .callout-tip .callout-title { color: var(--accent-emerald); }
+    .callout-important { border-left-color: var(--accent-purple); }
+    .callout-important .callout-title { color: var(--accent-purple); }
+    .callout-warning { border-left-color: var(--accent-amber); }
+    .callout-warning .callout-title { color: var(--accent-amber); }
+    .callout-caution { border-left-color: var(--accent-rose); }
+    .callout-caution .callout-title { color: var(--accent-rose); }
+
+    /* Code Blocks */
+    .code-wrapper {
+      position: relative;
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      background: rgba(0, 0, 0, 0.25);
+      border-bottom: 1px solid var(--border-color);
+      font-family: var(--font-code);
+      font-size: 0.78rem;
+      color: var(--text-faint);
+    }
+
+    .btn-copy {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 5px;
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      font-family: var(--font-body);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      border-color: var(--accent-cyan);
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      font-family: var(--font-code);
+      font-size: 0.88rem;
+      color: var(--code-text);
+      line-height: 1.6;
+    }
+
+    code { font-family: var(--font-code); font-size: 0.88em; }
+
+    p code, li code, td code {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--accent-cyan);
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      margin: 24px 0;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: var(--bg-surface);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      font-weight: 600;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    /* Flowchart Visual Box */
+    .flow-visual {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 30px;
+      margin: 30px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .flow-steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .flow-step-card {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .flow-step-card:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-3px);
+    }
+
+    .step-number {
+      display: inline-block;
+      width: 26px;
+      height: 26px;
+      line-height: 26px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      color: #0f172a;
+      font-weight: 700;
+      font-size: 0.8rem;
+      margin-bottom: 8px;
+    }
+
+    .flow-step-card h5 { font-size: 1rem; margin-bottom: 4px; }
+    .flow-step-card p { font-size: 0.78rem; color: var(--text-muted); margin: 0; }
+
+    /* Quality Gates Boxes */
+    .gate-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .gate-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px;
+      border-left: 4px solid var(--accent-blue);
+    }
+    .gate-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      color: var(--accent-cyan);
+    }
+
+    /* Interactive Cheat Sheet */
+    .cheatsheet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+    .cheat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .cheat-card h5 {
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cheat-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      background: var(--code-bg);
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+    }
+    .cheat-item code { color: var(--accent-emerald); }
+    .cheat-copy {
+      background: transparent;
+      border: none;
+      color: var(--text-faint);
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.15s ease;
+    }
+    .cheat-copy:hover { color: var(--text-main); background: rgba(255,255,255,0.1); }
+
+    /* Accordion FAQ */
+    .faq-item {
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      margin-bottom: 12px;
+      background: var(--bg-surface);
+      overflow: hidden;
+    }
+
+    .faq-question {
+      padding: 16px 20px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      transition: background 0.15s ease;
+    }
+    .faq-question:hover { background: var(--bg-surface-elevated); }
+
+    .faq-answer {
+      padding: 0 20px 16px 20px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      display: none;
+      border-top: 1px solid var(--border-color);
+      padding-top: 14px;
+    }
+    .faq-item.open .faq-answer { display: block; }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-secondary);
+      padding: 40px 24px;
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--text-faint);
+      margin-top: auto;
+    }
+
+    .license-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--accent-emerald);
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-bottom: 14px;
+    }
+
+    /* Back to Top */
+    .btn-top {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 40;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      color: #0f172a;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+    }
+    .btn-top.visible { opacity: 1; pointer-events: auto; }
+    .btn-top:hover { transform: translateY(-3px); }
+
+    /* Mobile */
+    @media (max-width: 1024px) {
+      .main-content { padding: 30px 24px 60px 24px; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        left: -100%;
+        top: 64px;
+        z-index: 45;
+        width: 290px;
+        background: var(--bg-primary);
+        transition: left 0.3s ease;
+        box-shadow: var(--shadow-lg);
+      }
+      .sidebar.open { left: 0; }
+      .mobile-menu-toggle { display: flex; }
+      .search-box { display: none; }
+      .hero-title { font-size: 1.75rem; }
+      .btn-github span { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button class="btn-icon mobile-menu-toggle" id="menuToggle" aria-label="เปิดเมนู">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <a href="#" class="nav-brand">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-cyan);"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+        <span>OpenSpec Guide</span>
+        <span class="brand-badge" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3);">Unofficial v1.x</span>
+      </a>
+    </div>
+
+    <div class="nav-controls">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="searchInput" placeholder="ค้นหาหัวข้อ / คำสั่ง..." autocomplete="off">
+      </div>
+
+      <button class="btn-icon" id="themeToggle" aria-label="สลับธีม สว่าง/มืด" title="สลับโหมด Dark/Light">
+        <svg id="moonIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg id="sunIcon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+      </button>
+
+      <a href="https://github.com/Fission-AI/OpenSpec" target="_blank" rel="noopener noreferrer" class="btn-github">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        <span>OpenSpec GitHub</span>
+      </a>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <!-- Sidebar: 18 Sections matching speckit-manual -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">📑 สารบัญเนื้อหา (18 หมวดหมู่)</div>
+        <ul class="sidebar-nav-list">
+          <li><a href="#intro" class="sidebar-link active">1. สรุปภาพรวม & แนวคิด SDD</a></li>
+          <li><a href="#prereq-install" class="sidebar-link">2. ข้อกำหนด & การติดตั้ง CLI</a></li>
+          <li><a href="#commands-types" class="sidebar-link">3. คำสั่ง 2 ประเภท (CLI vs Agent)</a></li>
+          <li><a href="#quickstart" class="sidebar-link">4. เริ่มต้นโปรเจกต์ใหม่แบบด่วน</a></li>
+          <li><a href="#workflow" class="sidebar-link">5. ลำดับขั้นตอน (เต็ม vs ย่อ)</a></li>
+          <li><a href="#agents-cmds" class="sidebar-link">6. เจาะลึกคำสั่ง Agent Skills</a></li>
+          <li><a href="#tricks" class="sidebar-link">7. เคล็ดลับการเขียน Prompt</a></li>
+          <li><a href="#best-practices" class="sidebar-link">8. แนวทางปฏิบัติที่ดี (Best Practices)</a></li>
+          <li><a href="#greenfield" class="sidebar-link">9. โปรเจกต์ใหม่ (Greenfield 0-to-1)</a></li>
+          <li><a href="#brownfield" class="sidebar-link">10. โปรเจกต์เดิม (Brownfield Legacy)</a></li>
+          <li><a href="#spec-maintenance" class="sidebar-link">11. การจัดการ & อัปเดตสเปก (Delta)</a></li>
+          <li><a href="#examples" class="sidebar-link">12. รวมตัวอย่างจริงและกรณีศึกษา</a></li>
+          <li><a href="#cli-cmds" class="sidebar-link">13. เจาะลึกคำสั่ง CLI ที่ใช้บ่อย</a></li>
+          <li><a href="#integrations" class="sidebar-link">14. Integrations (30+ AI Agents)</a></li>
+          <li><a href="#structure" class="sidebar-link">15. โครงสร้างไฟล์ในโปรเจกต์</a></li>
+          <li><a href="#multirepo" class="sidebar-link">16. Multi-Repo (Stores & Worksets)</a></li>
+          <li><a href="#troubleshoot" class="sidebar-link">17. การแก้ปัญหา (Troubleshooting)</a></li>
+          <li><a href="#cheatsheet" class="sidebar-link">18. Interactive Cheat Sheet</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">🔗 แหล่งข้อมูลทางการ</div>
+        <ul class="sidebar-nav-list">
+          <li><a href="https://openspec.dev" target="_blank" rel="noopener" class="sidebar-link">🌐 เว็บไซต์ทางการ OpenSpec</a></li>
+          <li><a href="https://openspec.dev/docs" target="_blank" rel="noopener" class="sidebar-link">📑 เอกสารทางเทคนิค (Docs)</a></li>
+          <li><a href="https://discord.gg/YctCnvvshC" target="_blank" rel="noopener" class="sidebar-link">💬 ชุมชน Discord</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+
+      <!-- Hero Banner (speckit-manual inspired) -->
+      <section class="hero-banner">
+        <div class="hero-tags">
+          <span class="hero-tag" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); font-weight: 600;">⚠️ Unofficial Community Manual</span>
+          <span class="hero-tag">Spec-Driven Development (SDD)</span>
+          <span class="hero-tag">Agreement Layer</span>
+          <span class="hero-tag">MIT Open Source</span>
+          <span class="hero-tag">30+ AI Coding Assistants</span>
+          <span class="hero-tag">Greenfield &amp; Brownfield</span>
+        </div>
+        <h1 class="hero-title">คู่มือการใช้งาน OpenSpec ฉบับใช้งานจริง (Unofficial v1.x)</h1>
+        <p class="hero-desc">
+          สรุปครบถ้วนเรื่อง <strong>Spec-Driven Development (SDD)</strong> — วิธีสั่งงาน AI Coding Assistant ให้ได้ผลลัพธ์ที่ตรงจุด มีเอกสารสเปกตรวจสอบย้อนกลับได้ และลดความผิดพลาด โดยการสร้าง <strong>"ชั้นข้อตกลง (Agreement Layer)"</strong> ตกลงรายละเอียดสเปก สถาปัตยกรรม และงาน ก่อนเริ่มเขียนโค้ด
+        </p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <a href="#quickstart" style="background: var(--accent-cyan); color: #0f172a; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none;">เริ่มต้นใช้งานด่วน &rarr;</a>
+          <a href="#workflow" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 20px; border-radius: 8px; font-weight: 500; text-decoration: none;">ดูขั้นตอนการทำงาน</a>
+          <a href="#cheatsheet" style="background: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 20px; border-radius: 8px; font-weight: 500; text-decoration: none;">Interactive Cheat Sheet</a>
+        </div>
+
+        <!-- Unofficial Disclaimer Banner -->
+        <div style="margin-top: 24px; padding: 16px 20px; border-radius: 12px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); display: flex; gap: 14px; align-items: flex-start;">
+          <span style="font-size: 1.4rem; line-height: 1;">⚠️</span>
+          <div style="font-size: 0.9rem; line-height: 1.6; color: var(--text-muted);">
+            <strong style="color: #fbbf24;">คำชี้แจงและข้อสงวนสิทธิ์ (Unofficial Disclaimer):</strong>
+            เอกสารฉบับนี้เป็น <strong>คู่มือภาษาไทยฉบับไม่เป็นทางการ (Unofficial Community Manual)</strong> จัดทำขึ้นโดยชุมชนนักพัฒนาเพื่อวัตถุประสงค์ในการศึกษาและเผยแพร่แนวคิด Spec-Driven Development (SDD) เท่านั้น ไม่ได้จัดทำ รับรอง หรือมีความเกี่ยวข้องอย่างเป็นทางการกับผู้พัฒนา OpenSpec ดั้งเดิม หรือ Fission-AI สำหรับเอกสารและข้อมูลที่เป็นทางการ กรุณาอ้างอิงจาก <a href="https://openspec.dev" target="_blank" rel="noopener" style="color: var(--accent-cyan); font-weight: 500; text-decoration: underline;">openspec.dev</a> และ <a href="https://github.com/Fission-AI/OpenSpec" target="_blank" rel="noopener" style="color: var(--accent-cyan); font-weight: 500; text-decoration: underline;">GitHub: Fission-AI/OpenSpec</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 1. Intro & SDD Concept -->
+      <section id="intro">
+        <h2><span class="section-badge">1</span> สรุปภาพรวม &amp; แนวคิด Spec-Driven Development (SDD)</h2>
+        <p>
+          <strong>OpenSpec</strong> เป็นโอเพนซอร์สมาตรฐานที่ช่วยยกระดับการทำงานกับ AI Coding Assistant จากการเขียนโค้ดแบบเดาสุ่ม (Vibe Coding) มาสู่กระบวนการที่รัดกุมผ่านแนวคิด <strong>Spec-Driven Development (SDD)</strong> โดยเปลี่ยน Specification ให้กลายเป็นสิ่งที่ "ตรวจสอบได้ (Executable)" และเป็นพิมพ์เขียวที่ AI ใช้สร้างโค้ดตามลำดับ
+        </p>
+
+        <div class="card-grid">
+          <div class="feature-card">
+            <h4>🎯 Agreement Layer</h4>
+            <p>ตกลงขอบเขต พฤติกรรม และเงื่อนไขที่ยอมรับได้ (Acceptance Criteria) กับ AI ให้เรียบร้อยในไฟล์ Markdown ก่อนแตะต้องโค้ด</p>
+          </div>
+          <div class="feature-card">
+            <h4>🛡️ ป้องกัน Scope Drift</h4>
+            <p>AI จะไม่แอบเพิ่มฟังก์ชันนอกเหนือความต้องการ ไม่หลุดสเปก และไม่ทำลายโค้ดเดิมที่มีอยู่แล้ว</p>
+          </div>
+          <div class="feature-card">
+            <h4>🧹 แก้ปัญหา Context ล้น</h4>
+            <p>แยกขั้นตอนคิด (Explore/Propose) ออกจากขั้นตอนทำ (Apply) ทำให้สามารถเปิด New Clean Session สำหรับเขียนโค้ดได้เสมอ</p>
+          </div>
+          <div class="feature-card">
+            <h4>📖 Living Documentation</h4>
+            <p>สเปกในโฟลเดอร์ <code>openspec/specs/</code> จะถูกรวมเข้าและเติบโตตามโค้ดจริง กลายเป็นเอกสารระบบที่ไม่มีวันล้าสมัย</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Prerequisites & Installation -->
+      <section id="prereq-install">
+        <h2><span class="section-badge">2</span> ข้อกำหนดของระบบ &amp; การติดตั้ง CLI</h2>
+        
+        <h3>ข้อกำหนดของระบบ (Prerequisites)</h3>
+        <ul>
+          <li><strong>Node.js:</strong> เวอร์ชัน <code>v20.19.0</code> ขึ้นไป (ตรวจสอบด้วย <code>node --version</code>)</li>
+          <li><strong>ระบบปฏิบัติการ:</strong> macOS, Linux, Windows</li>
+          <li><strong>AI Coding Assistants ที่รองรับ:</strong> Antigravity, Claude Code, Cursor, GitHub Copilot, Cline, Devin, Gemini CLI, Roo Code ฯลฯ</li>
+        </ul>
+
+        <h3>วิธีการติดตั้ง CLI ลงในเครื่อง</h3>
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>npm (วิธีแนะนำทั่วไป)</span>
+            <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+          </div>
+          <pre><code>npm install -g @fission-ai/openspec@latest</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>Homebrew (macOS และ Linux)</span>
+            <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+          </div>
+          <pre><code>brew install openspec</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>Bun, Deno หรือ Nix</span>
+            <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+          </div>
+          <pre><code># Bun (ยังต้องมี Node runtime ในเครื่อง)
+bun install -g @fission-ai/openspec@latest
+
+# Deno
+deno install --global --allow-read --allow-write --allow-env --allow-sys=cpus,homedir --allow-net=edge.openspec.dev npm:@fission-ai/openspec@latest
+
+# Nix Flake
+nix profile install github:Fission-AI/OpenSpec</code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-title">⚡ ติดตั้งผ่าน AI Chat Prompt</div>
+          ส่งข้อความนี้ในช่องแชทของ AI เพื่อให้ AI ติดตั้งและตรวจสอบสภาพแวดล้อมให้อัตโนมัติ:
+          <br><br>
+          <code>Fetch https://raw.githubusercontent.com/Fission-AI/OpenSpec/main/install.md and follow it.</code>
+        </div>
+      </section>
+
+      <!-- 3. Dual Command Types (CLI vs Agent) -->
+      <section id="commands-types">
+        <h2><span class="section-badge">3</span> คำสั่ง 2 ประเภทที่ต้องแยกให้ชัด (Terminal CLI vs AI Agent Chat)</h2>
+        <p>สิ่งที่ผู้เริ่มต้นมักสับสนคือการแยกระหว่าง <strong>คำสั่งใน Terminal</strong> กับ <strong>คำสั่งในช่องแชทของ AI</strong> ซึ่งมีหน้าที่และบริบทที่ต่างกันโดยสิ้นเชิง:</p>
+
+        <div class="command-channels">
+          <div class="channel-card cli">
+            <span class="channel-badge cli">1. CLI Commands (Terminal / Console)</span>
+            <h4>รันใน Terminal หรือ Command Prompt</h4>
+            <p style="font-size: 0.9rem; margin-bottom: 12px;">ใช้สำหรับเตรียมโปรเจกต์, ดู Dashboard, ตรวจสอบความถูกต้อง, และจัดการสเปกระดับเครื่อง</p>
+            <div class="code-wrapper" style="margin: 0;">
+              <pre><code># รันใน Terminal ของระบบ
+openspec init --tools antigravity
+openspec list --specs
+openspec view
+openspec validate add-auth
+openspec archive add-auth</code></pre>
+            </div>
+          </div>
+
+          <div class="channel-card agent">
+            <span class="channel-badge agent">2. Agentic Commands (Chat / Skill)</span>
+            <h4>พิมพ์ใน ช่องแชทของ AI Coding Assistant</h4>
+            <p style="font-size: 0.9rem; margin-bottom: 12px;">ใช้สำหรับสั่งงาน AI ควบคุมวงจรการวางแผน การสร้างสเปก และการเขียนโค้ด</p>
+            <div class="code-wrapper" style="margin: 0;">
+              <pre><code># พิมพ์ในหน้าต่างแชทของ AI
+/opsx-explore rate-limiting
+/opsx-propose add-rate-limiting
+/opsx-apply add-rate-limiting
+/opsx-archive add-rate-limiting</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Quickstart -->
+      <section id="quickstart">
+        <h2><span class="section-badge">4</span> เริ่มต้นโปรเจกต์ใหม่แบบด่วน (Quickstart 1-2-3-4)</h2>
+        <p>กระบวนการเริ่มต้นใช้งาน OpenSpec ตั้งแต่ศูนย์จนถึงส่งมอบงานแรก มีเพียง 4 ขั้นตอน:</p>
+
+        <div class="feature-card" style="margin-bottom: 16px;">
+          <h4>1. ติดตั้ง CLI และสร้างโปรเจกต์</h4>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>Terminal</span>
+              <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+            </div>
+            <pre><code>npm install -g @fission-ai/openspec@latest
+cd my-project
+openspec init --tools antigravity,cursor</code></pre>
+          </div>
+          <p style="font-size: 0.88rem;"><em>คำแนะนำ: รีสตาร์ต IDE ของคุณ 1 ครั้งเพื่อให้ AI โหลดคำสั่ง Workflows ใหม่เข้ามา</em></p>
+        </div>
+
+        <div class="feature-card" style="margin-bottom: 16px;">
+          <h4>2. สั่ง AI ร่างสเปกและแผนงาน (Propose)</h4>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>AI Chat</span>
+              <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+            </div>
+            <pre><code>/opsx-propose add-rate-limiting
+# หรือพิมพ์ภาษาธรรมชาติ:
+Propose a change to add IP-based rate limiting to our API.</code></pre>
+          </div>
+          <p style="font-size: 0.88rem;">AI จะสร้างเอกสารวางแผนใน <code>openspec/changes/add-rate-limiting/</code> โดยยังไม่แตะต้องโค้ด</p>
+        </div>
+
+        <div class="feature-card" style="margin-bottom: 16px;">
+          <h4>3. ตรวจทานแผน (Review) และสั่งลงมือทำ (Apply)</h4>
+          <p style="font-size: 0.9rem;">เปิดอ่านไฟล์ <code>tasks.md</code> เพื่อตรวจสอบรายการงาน จากนั้นเปิด New Chat Session แล้วสั่ง:</p>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>AI Chat</span>
+              <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+            </div>
+            <pre><code>/opsx-apply add-rate-limiting
+# หรือพิมพ์:
+Apply the add-rate-limiting change.</code></pre>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <h4>4. ส่งมอบงานและจัดเก็บประวัติ (Archive)</h4>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>AI Chat หรือ Terminal</span>
+              <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+            </div>
+            <pre><code>/opsx-archive add-rate-limiting
+# หรือใน Terminal:
+openspec archive add-rate-limiting</code></pre>
+          </div>
+          <p style="font-size: 0.88rem;">ระบบจะรวมความต้องการเข้าสู่ <code>openspec/specs/</code> และย้ายงานเข้า <code>archive/</code> จบวงจรสมบูรณ์</p>
+        </div>
+      </section>
+
+      <!-- 5. Workflow (Full vs Lite & Quality Gates) -->
+      <section id="workflow">
+        <h2><span class="section-badge">5</span> ลำดับวงจรการทำงาน (แบบเต็ม vs แบบย่อ &amp; Quality Gates)</h2>
+        
+        <div class="flow-visual">
+          <div class="flow-steps">
+            <div class="flow-step-card">
+              <span class="step-number">1</span>
+              <h5>Explore</h5>
+              <p>ระดมความคิด วิเคราะห์ทางเลือก (ห้ามเขียนโค้ด)</p>
+            </div>
+            <div class="flow-step-card">
+              <span class="step-number">2</span>
+              <h5>Propose</h5>
+              <p>สร้าง Change Proposal &amp; Delta Specs</p>
+            </div>
+            <div class="flow-step-card">
+              <span class="step-number">3</span>
+              <h5>Review</h5>
+              <p>มนุษย์ตรวจสอบและแก้ไขสเปก</p>
+            </div>
+            <div class="flow-step-card">
+              <span class="step-number">4</span>
+              <h5>Apply</h5>
+              <p>เขียนโค้ดตาม Tasks ทีละข้อ</p>
+            </div>
+            <div class="flow-step-card">
+              <span class="step-number">5</span>
+              <h5>Archive</h5>
+              <p>รวมสเปกเข้า Main Specs &amp; เก็บประวัติ</p>
+            </div>
+          </div>
+        </div>
+
+        <h3>🔍 3 ด่านตรวจคุณภาพ (Quality Gates) ใน Workflow แบบเต็ม</h3>
+        <div class="gate-grid">
+          <div class="gate-card">
+            <div class="gate-title">Gate 1: Review Specs (ตรวจสเปก)</div>
+            <p style="font-size: 0.88rem;">ตรวจสอบในไฟล์ <code>specs/</code> ว่าความต้องการมีคำว่า <code>SHALL</code> และ Scenarios <code>WHEN/THEN</code> ครอบคลุมพฤติกรรมที่ยอมรับได้ครบถ้วนหรือไม่</p>
+          </div>
+          <div class="gate-card">
+            <div class="gate-title">Gate 2: Tasks Sign-Off (ตรวจเช็กลิสต์)</div>
+            <p style="font-size: 0.88rem;">ตรวจทาน <code>tasks.md</code> ว่าแตกงานย่อยตรงตามสเปก ไม่มีงานส่วนเกิน และแบ่งขนาดไม่เกิน 15-30 นาทีต่องาน</p>
+          </div>
+          <div class="gate-card">
+            <div class="gate-title">Gate 3: Archive Verification (ตรวจก่อนรวม)</div>
+            <p style="font-size: 0.88rem;">รัน <code>openspec validate</code> เพื่อยืนยันว่าโครงสร้างถูกต้องทุกข้อ และทุก Task ถูกติ๊กถูก <code>[x]</code> ครบถ้วนก่อนสั่ง Archive</p>
+          </div>
+        </div>
+
+        <h3>ตารางเปรียบเทียบกระบวนการ: แบบเต็ม vs แบบย่อ</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>มิติเปรียบเทียบ</th>
+                <th>Workflow แบบเต็ม (Full Loop)</th>
+                <th>Workflow แบบย่อ (Lite / Fast-Track)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>สถานการณ์ที่เหมาะ</strong></td>
+                <td>ฟีเจอร์ใหญ่, ระบบแกนกลาง, เปลี่ยน Database Schema, ระบบชำระเงิน/ความปลอดภัย</td>
+                <td>งานแก้บั๊ก (Hotfix/Bugfix), ปรับ UI เล็กน้อย, เพิ่ม validation ฟิลด์เดียว, Prototype</td>
+              </tr>
+              <tr>
+                <td><strong>ขั้นตอน</strong></td>
+                <td>Explore &rarr; Propose &rarr; Review &rarr; Apply &rarr; Verify &rarr; Archive</td>
+                <td>Propose / Fast-Forward &rarr; Quick Review &rarr; Apply &rarr; Archive</td>
+              </tr>
+              <tr>
+                <td><strong>Artifacts ที่สร้าง</strong></td>
+                <td>ครบ 4 ไฟล์ (proposal, specs, design, tasks)</td>
+                <td>ย่อขนาด (proposal, specs, tasks โดยข้าม design.md)</td>
+              </tr>
+              <tr>
+                <td><strong>เวลาเฉลี่ย</strong></td>
+                <td>30 นาที – 2 ชั่วโมงต่อ Change</td>
+                <td>5 – 15 นาทีต่อ Change</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 6. Deep Dive: Agent Commands / Skills -->
+      <section id="agents-cmds">
+        <h2><span class="section-badge">6</span> เจาะลึกคำสั่ง Agent Skills (10 คำสั่งหลัก)</h2>
+        <p>รายละเอียดสัญญาการทำงาน (Skill Contracts) ที่ AI Coding Assistant ใช้:</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ชื่อ Skill</th>
+                <th>ประเภท</th>
+                <th>หน้าที่หลัก</th>
+                <th>สิ่งที่สร้าง (Creates)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>openspec-explore</code></td>
+                <td>Core</td>
+                <td>สำรวจและคิดร่วมกันก่อนวางแผน (ไม่เขียนโค้ด)</td>
+                <td>สรุปไอเดียในแชท (บันทึกเมื่อขอ)</td>
+              </tr>
+              <tr>
+                <td><code>openspec-propose</code></td>
+                <td>Core</td>
+                <td>ร่าง Change Proposal พร้อมเอกสาร 4 ชิ้นครบชุด</td>
+                <td><code>openspec/changes/&lt;name&gt;/</code></td>
+              </tr>
+              <tr>
+                <td><code>openspec-apply-change</code></td>
+                <td>Core</td>
+                <td>ลงมือเขียนโค้ดตามรายการเช็กลิสต์ใน <code>tasks.md</code></td>
+                <td>แก้ไขโค้ดจริงในโปรเจกต์</td>
+              </tr>
+              <tr>
+                <td><code>openspec-update-change</code></td>
+                <td>Core</td>
+                <td>ปรับปรุงแผนงานเมื่อสเปกหรือข้อตกลงเปลี่ยน</td>
+                <td>อัปเดตไฟล์ Artifacts เดิม</td>
+              </tr>
+              <tr>
+                <td><code>openspec-sync-specs</code></td>
+                <td>Core</td>
+                <td>ผสานเฉพาะ Delta Specs เข้า Main Specs ระหว่างทาง</td>
+                <td>อัปเดต <code>openspec/specs/</code></td>
+              </tr>
+              <tr>
+                <td><code>openspec-archive-change</code></td>
+                <td>Core</td>
+                <td>ตรวจงานครบ รวม Delta เข้า Main และย้ายเข้า Archive</td>
+                <td>อัปเดต <code>specs/</code> และย้ายโฟลเดอร์</td>
+              </tr>
+              <tr>
+                <td><code>openspec-verify-change</code></td>
+                <td>Optional</td>
+                <td>ตรวจสอบโค้ดที่สร้างขึ้นเทียบกับข้อกำหนดในสเปก</td>
+                <td>รายงานผลการ Verify</td>
+              </tr>
+              <tr>
+                <td><code>openspec-ff-change</code></td>
+                <td>Optional</td>
+                <td>สร้างเอกสารวางแผนทั้งหมดแบบ Fast-Forward รวดเดียว</td>
+                <td>สร้างทุก Artifact ใน Pass เดียว</td>
+              </tr>
+              <tr>
+                <td><code>openspec-bulk-archive-change</code></td>
+                <td>Optional</td>
+                <td>ส่งมอบและรวมหลาย Change Proposals พร้อมกัน</td>
+                <td>ย้ายหลายโฟลเดอร์เข้า Archive</td>
+              </tr>
+              <tr>
+                <td><code>openspec-onboard</code></td>
+                <td>Optional</td>
+                <td>เวิร์กโฟลว์สอนผู้ใช้ใหม่ด้วยการจำลองทำ 1 Change</td>
+                <td>ตัวอย่าง Change จำลอง</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 7. Prompting Tricks -->
+      <section id="tricks">
+        <h2><span class="section-badge">7</span> เคล็ดลับการเขียน Prompt และสั่งงาน AI</h2>
+        <div class="card-grid">
+          <div class="feature-card">
+            <h4>💡 ทริคที่ 1: เจาะจงที่ What &amp; Why</h4>
+            <p>ในคำสั่ง Propose ให้อธิบายปัญหาและผลลัพธ์ที่ต้องการ ไม่จำเป็นต้องสั่งภาษาโค้ด ปล่อยให้ AI ออกแบบใน <code>design.md</code></p>
+          </div>
+          <div class="feature-card">
+            <h4>💡 ทริคที่ 2: ใช้คำสั่ง New Session สำหรับ Apply</h4>
+            <p>เมื่อตรวจทานแผนเสร็จ ให้ปิดแชทเดิมแล้วเปิดหน้าต่างแชทใหม่ พิมพ์ <code>Apply the &lt;change&gt; change.</code> เพื่อให้ AI มี Context สะอาด 100%</p>
+          </div>
+          <div class="feature-card">
+            <h4>💡 ทริคที่ 3: สั่งแก้ที่ไฟล์แผนงานเสมอ</h4>
+            <p>หากโค้ดไม่ตรงใจ อย่าสั่งให้ AI แก้โค้ดมั่ว ให้สั่ง: <em>"Update tasks.md to include error handling for timeout, then resume apply."</em></p>
+          </div>
+          <div class="feature-card">
+            <h4>💡 ทริคที่ 4: สั่งให้ถามก่อนเริ่ม (Interview Pattern)</h4>
+            <p>สั่ง AI ว่า: <em>"Before proposing, ask me 3 clarifying questions about the edge cases."</em></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. Best Practices -->
+      <section id="best-practices">
+        <h2><span class="section-badge">8</span> แนวทางปฏิบัติที่ดี (Best Practices &amp; กฎเหล็ก)</h2>
+        <ul>
+          <li><strong>Right-Sizing:</strong> ซอย Change Proposal ให้มีขนาด 3-7 Tasks (ประมาณ 30 นาทีถึง 1 ชั่วโมงของเนื้องาน)</li>
+          <li><strong>กฎเหล็กของสเปก:</strong> ทุก Requirement ต้องมี <code>SHALL</code> และมีอย่างน้อย 2 Scenarios (Happy path 1 ข้อ และ Error path 1 ข้อ)</li>
+          <li><strong>Commit <code>openspec/</code> เข้า Git สม่ำเสมอ:</strong> ให้เพื่อนร่วมทีมเห็นประวัติและเหตุผลของการออกแบบทั้งหมด</li>
+          <li><strong>ห้ามข้ามขั้นตอนการ Review:</strong> การตรวจเอกสารใช้เวลา 30 วินาที แต่การแก้โค้ดที่ทำผิดทิศทางใช้เวลาหลายชั่วโมง</li>
+        </ul>
+      </section>
+
+      <!-- 9. Greenfield Project -->
+      <section id="greenfield">
+        <h2><span class="section-badge">9</span> โปรเจกต์ใหม่ตั้งแต่ศูนย์ (Greenfield 0-to-1 Step-by-Step)</h2>
+        <p>ตัวอย่างการเริ่มสร้างแอป <strong>Task Tracker</strong> จากโฟลเดอร์ว่างเปล่า:</p>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>ขั้นตอนที่ 1: เริ่มต้นโปรเจกต์</span>
+            <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+          </div>
+          <pre><code>mkdir task-tracker && cd task-tracker
+openspec init --tools antigravity,cursor</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>ขั้นตอนที่ 2: ใช้ Explore ให้ AI ช่วยเลือก Stack</span>
+            <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+          </div>
+          <pre><code>Help me explore a task tracker app from scratch. I haven't picked a stack yet.
+Compare options (e.g. Node vs Python, SQLite vs In-memory) and recommend the best starting point.</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>ขั้นตอนที่ 3: สั่ง Propose Change แรกสำหรับ Core Model</span>
+            <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+          </div>
+          <pre><code>Propose a change to create the initial task data model and SQLite schema.</code></pre>
+        </div>
+
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>ขั้นตอนที่ 4: Apply ใน New Session แล้ว Archive</span>
+            <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+          </div>
+          <pre><code>Apply the create-task-model change.
+# เมื่อเสร็จสิ้น:
+Archive the create-task-model change.</code></pre>
+        </div>
+        <p style="color: var(--accent-emerald);"><strong>ผลลัพธ์:</strong> เกิดไฟล์ Main Spec แรกที่ <code>openspec/specs/tasks/spec.md</code> เป็นพิมพ์เขียวให้ฟีเจอร์ถัดไป</p>
+      </section>
+
+      <!-- 10. Brownfield Project -->
+      <section id="brownfield">
+        <h2><span class="section-badge">10</span> โปรเจกต์เดิมที่มีโค้ดอยู่แล้ว (Brownfield &amp; Incremental Adoption)</h2>
+        <div class="callout callout-caution">
+          <div class="callout-title">⚠️ กฎเหล็กของ Brownfield: "อย่าต้มน้ำทั้งมหาสมุทร (Don't boil the ocean)"</div>
+          ห้ามพยายามให้ AI สแกนโค้ดทั้งแสนบรรทัดเพื่อเขียน Spec ให้ทั้งระบบในวันแรก! ให้ใช้กลยุทธ์ <strong>Incremental Adoption</strong> โดยให้สเปกค่อย ๆ งอกตามฟีเจอร์หรืองานแก้บั๊กที่เกิดขึ้นจริง
+        </div>
+
+        <p>ตัวอย่าง: มีระบบ E-Commerce เดิม ต้องการ <strong>เพิ่มระบบคูปองส่วนลดในขั้นตอน Checkout</strong>:</p>
+        <ol>
+          <li><strong>Initialize ในโปรเจกต์เดิม:</strong> <code>openspec init --tools antigravity</code> (โค้ดเดิมปลอดภัย 100%)</li>
+          <li><strong>ทำ Impact Analysis ด้วย Explore:</strong>
+            <div class="code-wrapper">
+              <pre><code>Help me explore adding coupon codes. Investigate `src/services/checkout.ts`. What are the regression risks?</code></pre>
+            </div>
+          </li>
+          <li><strong>สร้าง Delta Spec เฉพาะจุดที่กระทบ:</strong> สเปกจะระบุ <code>ADDED</code> (คูปอง) และ <code>MODIFIED</code> (การคิดราคารวม)</li>
+          <li><strong>Apply เฉพาะจุด &amp; Archive:</strong> โค้ดเดิมไม่พัง และเกิดไฟล์ <code>openspec/specs/checkout/spec.md</code> ขึ้นเป็นชิ้นแรกของระบบเดิม</li>
+        </ol>
+      </section>
+
+      <!-- 11. Spec Maintenance & Deltas -->
+      <section id="spec-maintenance">
+        <h2><span class="section-badge">11</span> การจัดการ &amp; อัปเดตสเปก (Delta Specs System)</h2>
+        <p>ในแต่ละ Change Proposal ไฟล์สเปกจะระบุเฉพาะส่วนที่เปลี่ยนแปลง แบ่งเป็น 4 หมวดหมู่:</p>
+        
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>Delta Spec Format</span>
+            <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+          </div>
+          <pre><code># Delta Spec: Checkout System
+
+## ADDED Requirements
+### Requirement: Coupon Code Validation
+The system SHALL validate expiration date and minimum spend for coupons.
+
+## MODIFIED Requirements
+### Requirement: Order Total Calculation
+The system SHALL subtract discount amount before applying VAT.
+
+## REMOVED Requirements
+### Requirement: Legacy Promo Flags
+
+## RENAMED Requirements
+- FROM: `Requirement: Basic Cart`
+- TO: `Requirement: Standard Cart`</code></pre>
+        </div>
+      </section>
+
+      <!-- 12. Real-World Examples -->
+      <section id="examples">
+        <h2><span class="section-badge">12</span> รวมตัวอย่างจริงและกรณีศึกษา</h2>
+        <div class="card-grid">
+          <div class="feature-card">
+            <h4>🔐 Authentication (OAuth2)</h4>
+            <p>ตัวอย่างการวางสเปก Google &amp; GitHub Login พร้อมเงื่อนไข Token Refresh และ CSRF Protection</p>
+          </div>
+          <div class="feature-card">
+            <h4>⏱️ Tiered Rate Limiting</h4>
+            <p>ระบบจำกัดความถี่การเรียก API แยกตามระดับสิทธิ์ผู้ใช้ (Anonymous: 60/min, Pro: 1000/min)</p>
+          </div>
+          <div class="feature-card">
+            <h4>💳 Stripe Payment Intent</h4>
+            <p>สเปกระบบชำระเงินพร้อมดักจับ Webhook events และการจัดการกรณีบัตรถูกปฏิเสธ</p>
+          </div>
+          <div class="feature-card">
+            <h4>🔄 Database Migration</h4>
+            <p>การปรับโครงสร้างตารางข้อมูลขนาดใหญ่โดยไม่เกิด Downtime (Zero-downtime migration)</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13. CLI Reference -->
+      <section id="cli-cmds">
+        <h2><span class="section-badge">13</span> เจาะลึกคำสั่ง CLI ที่ใช้บ่อย (CLI Reference)</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>คำสั่ง</th>
+                <th>ตัวอย่าง</th>
+                <th>คำอธิบาย</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>openspec init</code></td>
+                <td><code>openspec init --tools antigravity</code></td>
+                <td>ติดตั้ง OpenSpec ในโปรเจกต์</td>
+              </tr>
+              <tr>
+                <td><code>openspec list</code></td>
+                <td><code>openspec list --specs</code></td>
+                <td>แสดงรายการ Change Proposals หรือ Main Specs</td>
+              </tr>
+              <tr>
+                <td><code>openspec show</code></td>
+                <td><code>openspec show add-auth --json</code></td>
+                <td>พิมพ์เนื้อหาของ Change หรือ Spec ออกมาทางหน้าจอ</td>
+              </tr>
+              <tr>
+                <td><code>openspec view</code></td>
+                <td><code>openspec view</code></td>
+                <td>เปิดหน้าจอ Dashboard สรุปภาพรวมของโปรเจกต์</td>
+              </tr>
+              <tr>
+                <td><code>openspec validate</code></td>
+                <td><code>openspec validate add-auth</code></td>
+                <td>ตรวจสอบความถูกต้องของสเปกและเช็กลิสต์</td>
+              </tr>
+              <tr>
+                <td><code>openspec archive</code></td>
+                <td><code>openspec archive add-auth</code></td>
+                <td>รวม Delta เข้า Main และย้ายเข้า Archive</td>
+              </tr>
+              <tr>
+                <td><code>openspec update</code></td>
+                <td><code>openspec update</code></td>
+                <td>อัปเดตไฟล์ Workflow ให้เป็นเวอร์ชันล่าสุด</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 14. Integrations Matrix -->
+      <section id="integrations">
+        <h2><span class="section-badge">14</span> Integrations (ตารางรองรับ AI Coding Agents 30+ ตัว)</h2>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>AI Assistant</th>
+                <th>Flag ID</th>
+                <th>โฟลเดอร์ Skills</th>
+                <th>โฟลเดอร์ Commands</th>
+                <th>ตัวอย่างคำสั่ง</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Antigravity</strong></td>
+                <td><code>antigravity</code></td>
+                <td><code>.agents/skills/</code></td>
+                <td><code>.agents/workflows/</code></td>
+                <td><code>/opsx-apply</code></td>
+              </tr>
+              <tr>
+                <td><strong>Claude Code</strong></td>
+                <td><code>claude</code></td>
+                <td><code>.claude/skills/</code></td>
+                <td><code>.claude/commands/opsx/</code></td>
+                <td><code>/opsx:apply</code></td>
+              </tr>
+              <tr>
+                <td><strong>Cursor</strong></td>
+                <td><code>cursor</code></td>
+                <td><code>.cursor/skills/</code></td>
+                <td><code>.cursor/commands/</code></td>
+                <td><code>/opsx-apply</code></td>
+              </tr>
+              <tr>
+                <td><strong>GitHub Copilot</strong></td>
+                <td><code>github-copilot</code></td>
+                <td><code>.github/skills/</code></td>
+                <td><code>.github/prompts/</code></td>
+                <td><code>/opsx-apply</code></td>
+              </tr>
+              <tr>
+                <td><strong>Cline</strong></td>
+                <td><code>cline</code></td>
+                <td><code>.cline/skills/</code></td>
+                <td><code>.clinerules/workflows/</code></td>
+                <td><code>/opsx-apply</code></td>
+              </tr>
+              <tr>
+                <td><strong>Devin Desktop</strong></td>
+                <td><code>devin</code></td>
+                <td><code>.devin/skills/</code></td>
+                <td><code>.devin/workflows/</code></td>
+                <td><code>/opsx-apply</code></td>
+              </tr>
+              <tr>
+                <td><strong>Gemini CLI</strong></td>
+                <td><code>gemini</code></td>
+                <td><code>.gemini/skills/</code></td>
+                <td><code>.gemini/commands/opsx/</code></td>
+                <td><code>/opsx:apply</code></td>
+              </tr>
+              <tr>
+                <td><strong>Roo Code (Zoo)</strong></td>
+                <td><code>roocode</code></td>
+                <td><code>.roo/skills/</code></td>
+                <td><code>.roo/commands/</code></td>
+                <td><code>/opsx-apply</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 15. Project Structure & Config -->
+      <section id="structure">
+        <h2><span class="section-badge">15</span> โครงสร้างไฟล์ในโปรเจกต์ &amp; การตั้งค่า `config.yaml`</h2>
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>openspec/config.yaml</span>
+            <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+          </div>
+          <pre><code>schema: spec-driven
+
+context: |
+  Tech Stack: Next.js 15, TypeScript, Tailwind CSS, PostgreSQL.
+  Testing: Vitest for unit tests, Playwright for E2E.
+  Code Style: Functional components, strict type-checking, zero any.
+
+rules:
+  proposal:
+    - Focus heavily on business impact and edge cases.
+  specs:
+    - Write at least 2 scenarios (1 happy path, 1 failure) per requirement.
+  tasks:
+    - Keep each task small and actionable (under 20 mins of work).
+
+operations:
+  apply:
+    - Run `npm test` after modifying core logic.</code></pre>
+        </div>
+      </section>
+
+      <!-- 16. Multi-Repo Architecture -->
+      <section id="multirepo">
+        <h2><span class="section-badge">16</span> Multi-Repo Architecture (Stores &amp; Worksets)</h2>
+        <p>สำหรับองค์กรที่มีหลาย Git Repositories แต่ต้องการแชร์สเปกและการวางแผนร่วมกัน:</p>
+        <div class="code-wrapper">
+          <div class="code-header">
+            <span>การสร้างและผูก Store กลาง</span>
+            <button class="btn-copy" onclick="copyCode(this)">คัดลอก</button>
+          </div>
+          <pre><code># 1. สร้าง Store กลางในเครื่อง
+openspec store create platform-specs ~/workspace/platform-specs
+
+# 2. ใน Repo ลูกแต่ละตัว ใส่บรรทัดนี้ใน openspec/config.yaml:
+store: platform-specs</code></pre>
+        </div>
+        <p style="font-size: 0.9rem;">ผลลัพธ์: สเปกจะถูกจัดเก็บและซิงค์ไว้ที่ Store กลาง แต่เมื่อสั่ง Apply ตัว AI จะแก้ไขโค้ดใน Repo ปัจจุบันให้อัตโนมัติ</p>
+      </section>
+
+      <!-- 17. Troubleshooting & FAQ -->
+      <section id="troubleshoot">
+        <h2><span class="section-badge">17</span> การแก้ปัญหาที่พบบ่อย (Troubleshooting &amp; FAQ)</h2>
+        
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Q: AI เริ่มเขียนโค้ดทันทีในขั้นตอน Propose หรือไม่?</span>
+            <span>+</span>
+          </div>
+          <div class="faq-answer">
+            ไม่ครับ OpenSpec มีกฎเหล็กว่าในขั้นตอน Propose ตัว AI จะหยุดทันทีที่สร้างเอกสารวางแผนเสร็จ เพื่อรอให้คุณตรวจสอบก่อนเสมอ จะเริ่มเขียนโค้ดก็ต่อเมื่อได้รับคำสั่ง Apply เท่านั้น
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Q: หลังรัน init แล้วใน IDE ไม่เห็นคำสั่ง Slash Commands?</span>
+            <span>+</span>
+          </div>
+          <div class="faq-answer">
+            ให้ทำการ Restart หรือ Reload Window ของโปรแกรม IDE (เช่น Cursor หรือ Antigravity) 1 ครั้ง เพื่อให้ตัวโปรแกรมโหลดไฟล์ Workflows ใหม่เข้ามาในสภาพแวดล้อม
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">
+            <span>Q: นำคู่มือนี้ไปเผยแพร่ต่อจะผิดลิขสิทธิ์หรือไม่?</span>
+            <span>+</span>
+          </div>
+          <div class="faq-answer">
+            ไม่ผิดลิขสิทธิ์ครับ เนื่องจากโครงการ OpenSpec เผยแพร่ภายใต้สัญญาอนุญาต <strong>MIT License</strong> ซึ่งอนุญาตให้ทำซ้ำ ดัดแปลง แปลภาษา และเผยแพร่ได้อย่างเสรี เพียงแค่ต้องคงข้อความประกาศลิขสิทธิ์ (Attribution) ของผู้พัฒนาต้นทางไว้ด้วย
+          </div>
+        </div>
+      </section>
+
+      <!-- 18. Interactive Cheat Sheet -->
+      <section id="cheatsheet">
+        <h2><span class="section-badge">18</span> Interactive Cheat Sheet (สูตรลัดคัดลอกได้ทันที)</h2>
+        <p>รวบรวมคำสั่งที่ใช้บ่อยที่สุด สามารถกดปุ่มคัดลอกไปใช้งานได้ทันที:</p>
+
+        <div class="cheatsheet-grid">
+          <div class="cheat-card">
+            <h5>🚀 Day-1 Setup (ติดตั้งโปรเจกต์)</h5>
+            <div class="cheat-item">
+              <code>openspec init</code>
+              <button class="cheat-copy" onclick="copySnippet('openspec init', this)" title="คัดลอก">Copy</button>
+            </div>
+            <div class="cheat-item">
+              <code>openspec init --tools antigravity,cursor</code>
+              <button class="cheat-copy" onclick="copySnippet('openspec init --tools antigravity,cursor', this)" title="คัดลอก">Copy</button>
+            </div>
+            <div class="cheat-item">
+              <code>openspec update</code>
+              <button class="cheat-copy" onclick="copySnippet('openspec update', this)" title="คัดลอก">Copy</button>
+            </div>
+          </div>
+
+          <div class="cheat-card">
+            <h5>🔄 Daily Loop (คำสั่งใน AI Chat)</h5>
+            <div class="cheat-item">
+              <code>/opsx-explore &lt;topic&gt;</code>
+              <button class="cheat-copy" onclick="copySnippet('/opsx-explore ', this)" title="คัดลอก">Copy</button>
+            </div>
+            <div class="cheat-item">
+              <code>/opsx-propose &lt;change-name&gt;</code>
+              <button class="cheat-copy" onclick="copySnippet('/opsx-propose ', this)" title="คัดลอก">Copy</button>
+            </div>
+            <div class="cheat-item">
+              <code>/opsx-apply &lt;change-name&gt;</code>
+              <button class="cheat-copy" onclick="copySnippet('/opsx-apply ', this)" title="คัดลอก">Copy</button>
+            </div>
+            <div class="cheat-item">
+              <code>/opsx-archive &lt;change-name&gt;</code>
+              <button class="cheat-copy" onclick="copySnippet('/opsx-archive ', this)" title="คัดลอก">Copy</button>
+            </div>
+          </div>
+
+          <div class="cheat-card">
+            <h5>⚡ Fast-Track &amp; Utilities</h5>
+            <div class="cheat-item">
+              <code>/openspec-ff-change</code>
+              <button class="cheat-copy" onclick="copySnippet('/openspec-ff-change', this)" title="คัดลอก">Copy</button>
+            </div>
+            <div class="cheat-item">
+              <code>openspec view</code>
+              <button class="cheat-copy" onclick="copySnippet('openspec view', this)" title="คัดลอก">Copy</button>
+            </div>
+            <div class="cheat-item">
+              <code>openspec validate &lt;name&gt;</code>
+              <button class="cheat-copy" onclick="copySnippet('openspec validate ', this)" title="คัดลอก">Copy</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Footer & Copyright Attribution (speckit-manual inspired) -->
+  <footer class="footer">
+    <div class="license-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+      MIT Licensed Open Source Project
+    </div>
+    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px;">
+      <strong>หมายเหตุ:</strong> คู่มือนี้เป็นเอกสารฉบับไม่เป็นทางการ (Unofficial Community Edition) จัดทำขึ้นเพื่อส่งเสริมการเรียนรู้ ไม่มีส่วนเกี่ยวข้องอย่างเป็นทางการกับผู้พัฒนา Fission-AI
+    </p>
+    <p style="margin-bottom: 8px;">
+      อ้างอิงและเรียบเรียงเนื้อหาจากโครงการทางการ 
+      <a href="https://github.com/Fission-AI/OpenSpec" target="_blank" rel="noopener">Fission-AI/OpenSpec</a> 
+      และเว็บไซต์ <a href="https://openspec.dev" target="_blank" rel="noopener">openspec.dev</a>
+    </p>
+    <p style="font-size: 0.8rem; color: var(--text-faint);">
+      Copyright (c) 2024 OpenSpec Contributors &bull; Released under the MIT License.<br>
+      จัดทำเพื่อส่งเสริมการใช้งาน OpenSpec ในชุมชนนักพัฒนาชาวไทย (Community Documentation)
+    </p>
+  </footer>
+
+  <!-- Back to Top Button -->
+  <button class="btn-top" id="btnTop" aria-label="เลื่อนขึ้นบนสุด" title="กลับขึ้นด้านบน">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
+
+  <script>
+    // Theme Toggle Logic
+    const themeToggle = document.getElementById('themeToggle');
+    const moonIcon = document.getElementById('moonIcon');
+    const sunIcon = document.getElementById('sunIcon');
+    const html = document.documentElement;
+
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    setTheme(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      setTheme(newTheme);
+    });
+
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      if (theme === 'dark') {
+        moonIcon.style.display = 'block';
+        sunIcon.style.display = 'none';
+      } else {
+        moonIcon.style.display = 'none';
+        sunIcon.style.display = 'block';
+      }
+    }
+
+    // Mobile Sidebar Toggle
+    const menuToggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+
+    menuToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+          sidebar.classList.remove('open');
+        }
+      });
+    });
+
+    // Copy Code functionality
+    function copyCode(btn) {
+      const codeWrapper = btn.closest('.code-wrapper');
+      const code = codeWrapper.querySelector('pre code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = 'คัดลอกแล้ว! ✓';
+        btn.style.color = 'var(--accent-emerald)';
+        btn.style.borderColor = 'var(--accent-emerald)';
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.style.color = '';
+          btn.style.borderColor = '';
+        }, 2000);
+      });
+    }
+
+    // Copy Snippet for Cheat Sheet
+    function copySnippet(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const orig = btn.innerText;
+        btn.innerText = '✓';
+        btn.style.color = 'var(--accent-emerald)';
+        setTimeout(() => {
+          btn.innerText = orig;
+          btn.style.color = '';
+        }, 1500);
+      });
+    }
+
+    // Scrollspy for Sidebar Links across all 18 sections
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.sidebar-nav-list a[href^="#"]');
+
+    window.addEventListener('scroll', () => {
+      let current = '';
+      const scrollPos = window.scrollY + 120;
+
+      sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.offsetHeight;
+        if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+          current = section.getAttribute('id');
+        }
+      });
+
+      if (current) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${current}`) {
+            link.classList.add('active');
+          }
+        });
+      }
+
+      // Back to top button visibility
+      const btnTop = document.getElementById('btnTop');
+      if (window.scrollY > 400) {
+        btnTop.classList.add('visible');
+      } else {
+        btnTop.classList.remove('visible');
+      }
+    });
+
+    document.getElementById('btnTop').addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Search filter for headings and text in sidebar
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      const sidebarLinks = document.querySelectorAll('.sidebar-nav-list a[href^="#"]');
+      
+      if (!query) {
+        sidebarLinks.forEach(link => link.style.display = 'flex');
+        return;
+      }
+
+      sidebarLinks.forEach(link => {
+        const text = link.innerText.toLowerCase();
+        if (text.includes(query)) {
+          link.style.display = 'flex';
+        } else {
+          link.style.display = 'none';
+        }
+      });
+    });
+
+    // FAQ Accordion Toggle
+    document.querySelectorAll('.faq-question').forEach(q => {
+      q.addEventListener('click', () => {
+        const parent = q.closest('.faq-item');
+        parent.classList.toggle('open');
+        const icon = q.querySelector('span:last-child');
+        icon.innerText = parent.classList.contains('open') ? '−' : '+';
+      });
+    });
+  </script>
+</body>
+</html>
